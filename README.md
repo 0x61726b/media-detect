@@ -16,22 +16,22 @@ var NativeMD = require('media-detect').MediaDetect;
 var MediaDetect = new NativeMD();
 
 //Called when a new window created,i.e., you launch a program/explorer
-D.SetWindowCreateCallback( function(arg) { //Arg will be [WindowName,WindowId]
+MediaDetect.SetWindowCreateCallback( function(arg) { //Arg will be [WindowName,WindowId]
   //...
 });
 
 //Called when a window is activated
-D.SetWindowActivateCallback( function(arg) { //Arg will be [WindowName,WindowId]
+MediaDetect.SetWindowActivateCallback( function(arg) { //Arg will be [WindowName,WindowId]
   //...
 });
 
 //Called when a window closed/destroyed
-D.SetWindowCloseCallback( function(arg) { //Arg will be [WindowName,WindowId]
+MediaDetect.SetWindowCloseCallback( function(arg) { //Arg will be [WindowName,WindowId]
   //...
 });
 
 //Called when a window changes monitor
-D.SetWindowMonitorChangeCallback( function(arg) { //Arg will be [WindowName,WindowId]
+MediaDetect.SetWindowMonitorChangeCallback( function(arg) { //Arg will be [WindowName,WindowId]
   //...
 });
 
