@@ -1,7 +1,7 @@
 #Media Detect
 
 Media-Detect is a tool that listens global window creation/destruction and fires callbacks accordingly.
-Only works on Windows for *now*.
+Only works on Windows for *now*. On Windows the library hooks into shell using **RegisterShellHookWindow** then listens shell messages and fires javascript callbacks.
 
 ![](http://i.imgur.com/L9U8OOK.png)
 
