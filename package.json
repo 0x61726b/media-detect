@@ -1,7 +1,7 @@
 {
   "name": "media-detect",
-  "version": "0.0.1",
-  "description": "Native node module for detecting video player software",
+  "version": "0.0.3",
+  "description": "Native node module for detecting global window creation/destruction",
   "main": "index.js",
   "devDependencies": {
     "nan": "^2.0.5",
@@ -21,10 +21,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arkenthera/chiika-node.git"
+    "url": "git+https://github.com/arkenthera/media-detect.git"
   },
   "keywords": [
-    "chiika"
+    "shell hook",
+    "win32",
+    "shell",
+    "hook",
+    "global window events"
   ],
   "author": "arkenthera",
   "license": "ISC",

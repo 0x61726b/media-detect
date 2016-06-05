@@ -1,5 +1,8 @@
 #Media Detect
 
+```npm install media-detect```
+
+
 Media-Detect is a tool that listens global window creation/destruction and fires callbacks accordingly.
 Only works on Windows for *now*. On Windows the library hooks into shell using **RegisterShellHookWindow** then listens shell messages and fires javascript callbacks.
 
@@ -42,3 +45,16 @@ MediaDetect.SetWindowMonitorChangeCallback( function(arg) { //Arg will be [Windo
 Install ```npm i jasmine-node``` then run ```npm test```. Then launch some windows/apps and see the output.
 
 ![](http://i.imgur.com/q28a5GV.png)
+
+
+#Installing
+
+``` npm install media-detect ```
+
+You'll need
+
+-MSVC for Windows (Visual Studio 2013)
+-node-gyp
+-NaN
+
+or just type ```npm install``` and NPM will build it for you.
