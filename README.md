@@ -53,8 +53,8 @@ Install ```npm i jasmine-node``` then run ```npm test```. Then launch some windo
 
 You'll need
 
--MSVC for Windows (Visual Studio 2013)
--node-gyp
--NaN
+- MSVC for Windows (Visual Studio 2013)
+- node-gyp
+- NaN
 
 or just type ```npm install``` and NPM will build it for you.
