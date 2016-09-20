@@ -9,7 +9,8 @@
                     "src/MediaDetect.cc",
                     "src/Win32MediaDetect.h",
                     "src/Win32MediaDetect.cc",
-                    "src/Init.cc"
+                    "src/Init.cc",
+                    "src/MSAAWin32.h"
             ],
             "cflags": [
                 "-std=c++11"

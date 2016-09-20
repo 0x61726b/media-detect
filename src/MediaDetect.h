@@ -24,10 +24,6 @@
 //----------------------------------------------------------------------------
 namespace MediaDetect
 {
-	typedef std::map<std::string,
-		std::pair<Nan::Persistent<v8::Object,v8::CopyablePersistentTraits<v8::Object>>,
-		Nan::Persistent<v8::Function,v8::CopyablePersistentTraits<v8::Function>> >> CallbackMap;
-
 	class MediaDetectWrapper : public Nan::ObjectWrap
 	{
 	public:
@@ -39,18 +35,14 @@ namespace MediaDetect
 
 		static NAN_METHOD(New);
 
-		static NAN_METHOD(SetWindowCreateCallback);
-		static NAN_METHOD(SetWindowActivateCallback);
-		static NAN_METHOD(SetWindowCloseCallback);
-		static NAN_METHOD(SetWindowMonitorChangeCallback);
+
+		static NAN_METHOD(GetRunningPlayers);
+		static NAN_METHOD(GetActiveTabLink);
+		static NAN_METHOD(CheckIfTabIsOpen);
+		static NAN_METHOD(GetVideoFileOpenByPlayer);
+		static NAN_METHOD(Release);
 
 		static Nan::Persistent<v8::Function> constructor;
-
-		static NAN_PROPERTY_GETTER(MediaDetectWrapperGetter);
-
-		void OnMediaDetected(DetectInfo* detected);
-
-		Win32MediaDetect mediaDetector_;
 	};
 
 }

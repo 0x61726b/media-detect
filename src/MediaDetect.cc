@@ -14,10 +14,11 @@
 //51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.*/
 //----------------------------------------------------------------------------
 #include "MediaDetect.h"
+#include <iostream>
 //----------------------------------------------------------------------------
 
 Nan::Persistent<v8::Function> MediaDetect::MediaDetectWrapper::constructor;
-MediaDetect::CallbackMap g_CallbackMap;
+
 
 using v8::Function;
 using v8::FunctionCallbackInfo;
@@ -51,71 +52,86 @@ namespace MediaDetect
 		v8::Local<v8::ObjectTemplate> inst = tpl->InstanceTemplate();
 
 
-		Nan::SetPrototypeMethod(tpl,"SetWindowCreateCallback",MediaDetectWrapper::SetWindowCreateCallback);
-		Nan::SetPrototypeMethod(tpl,"SetWindowActivateCallback",MediaDetectWrapper::SetWindowActivateCallback);
-		Nan::SetPrototypeMethod(tpl,"SetWindowCloseCallback",MediaDetectWrapper::SetWindowCloseCallback);
-		Nan::SetPrototypeMethod(tpl,"SetWindowMonitorChangeCallback",MediaDetectWrapper::SetWindowCloseCallback);
-
-
-		//tpl->Set(DEFINE_PROPERTY(kArgsLogLevel,Nan::New(1)));
-
-		//tpl->Set(DEFINE_PROPERTY(kArgsUserName,Nan::New("Not_Defined").ToLocalChecked()));
-		//tpl->Set(DEFINE_PROPERTY(kArgsPass,Nan::New("Not_Defined").ToLocalChecked()));
-		//tpl->Set(DEFINE_PROPERTY(kArgsModulePath,Nan::New("Not_Defined").ToLocalChecked()));
+		Nan::SetPrototypeMethod(tpl,"GetCurrentWindows",MediaDetectWrapper::GetRunningPlayers);
+		Nan::SetPrototypeMethod(tpl,"GetVideoFileOpenByPlayer",MediaDetectWrapper::GetVideoFileOpenByPlayer);
+		Nan::SetPrototypeMethod(tpl,"GetActiveTabLink",MediaDetectWrapper::GetActiveTabLink);
+		Nan::SetPrototypeMethod(tpl,"CheckIfTabIsOpen",MediaDetectWrapper::CheckIfTabIsOpen);
+		Nan::SetPrototypeMethod(tpl,"Release",MediaDetectWrapper::Release);
 
 
 		constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
 		Nan::Set(target,Nan::New("MediaDetect").ToLocalChecked(),Nan::GetFunction(tpl).ToLocalChecked());
+
+#ifdef _WIN32
+		CoInitialize(NULL);
+#endif
 	}
 
-	NAN_METHOD(MediaDetectWrapper::SetWindowCreateCallback)
+	NAN_METHOD(MediaDetectWrapper::Release)
 	{
-		PersistentFunction windowCreated;
-		windowCreated.Reset((info[0].As<Function>()));
-
-		PersistentObject caller;
-		caller.Reset(info.This());
-
-		g_CallbackMap.insert(std::make_pair("WindowCreated",
-			std::make_pair(caller,windowCreated)));
-
+#ifdef _WIN32
+		CoUninitialize();
+#endif
 	}
 
-	NAN_METHOD(MediaDetectWrapper::SetWindowActivateCallback)
+	NAN_METHOD(MediaDetectWrapper::GetVideoFileOpenByPlayer)
 	{
-		PersistentFunction windowActivated;
-		windowActivated.Reset((info[0].As<Function>()));
+		v8::Local<v8::Array> args = info[0].As<v8::Array>();
+		v8::Isolate* isolate = info.GetIsolate();
 
-		PersistentObject caller;
-		caller.Reset(info.This());
+		V8Value argPid = args->Get(v8::String::NewFromUtf8(isolate,"pid"));
 
-		g_CallbackMap.insert(std::make_pair("WindowActivated",
-			std::make_pair(caller,windowActivated)));
+
+		int32_t pid = argPid->Int32Value();
+
+		Win32MediaDetect win32;
+		std::vector<std::string> files = win32.GetFilesOpenByProcess(pid);
+
+		if(files.size())
+		{
+			std::string videoFile = files[0];
+			info.GetReturnValue().Set(Nan::New(videoFile).ToLocalChecked());
+		}
+		else
+			info.GetReturnValue().Set(Nan::Null());
 	}
 
-	NAN_METHOD(MediaDetectWrapper::SetWindowCloseCallback)
+	NAN_METHOD(MediaDetectWrapper::GetRunningPlayers)
 	{
-		PersistentFunction windowClosed;
-		windowClosed.Reset((info[0].As<Function>()));
+		/*	PersistentFunction windowCreated;
+			windowCreated.Reset((info[0].As<Function>()));
 
-		PersistentObject caller;
-		caller.Reset(info.This());
+			PersistentObject caller;
+			caller.Reset(info.This());*/
 
-		g_CallbackMap.insert(std::make_pair("WindowClosed",
-			std::make_pair(caller,windowClosed)));
+
+		typedef std::vector<WndInfo> WindowVector;
+		Win32MediaDetect win32;
+		WindowVector players = win32.GetWindows();
+		WindowVector::iterator playersIt = players.begin();
+
+		Local<Object> returnVal = Nan::New<v8::Object>();
+
+		Local<v8::Array> playerArray = Nan::New<v8::Array>((int)players.size());
+
+		unsigned counter = 0;
+		for(playersIt; playersIt != players.end(); ++playersIt,++counter)
+		{
+			Local<Object> player = Nan::New<v8::Object>();
+			Nan::Set(player,Nan::New("windowTitle").ToLocalChecked(),Nan::New((*playersIt).Title).ToLocalChecked());
+			Nan::Set(player,Nan::New("windowClass").ToLocalChecked(),Nan::New((*playersIt).ClassName).ToLocalChecked());
+			Nan::Set(player,Nan::New("processName").ToLocalChecked(),Nan::New((*playersIt).ProcessName).ToLocalChecked());
+			Nan::Set(player,Nan::New("PID").ToLocalChecked(),Nan::New((unsigned)(*playersIt).ProcessID));
+			Nan::Set(player,Nan::New("Handle").ToLocalChecked(),Nan::New((uint32_t)(*playersIt).Handle));
+
+			Nan::Set(playerArray,counter,player);
+		}
+
+		Nan::Set(returnVal,Nan::New("PlayerArray").ToLocalChecked(),playerArray);
+
+		info.GetReturnValue().Set(returnVal);
 	}
 
-	NAN_METHOD(MediaDetectWrapper::SetWindowMonitorChangeCallback)
-	{
-		PersistentFunction windowClosed;
-		windowClosed.Reset((info[0].As<Function>()));
-
-		PersistentObject caller;
-		caller.Reset(info.This());
-
-		g_CallbackMap.insert(std::make_pair("WindowMonitorChanged",
-			std::make_pair(caller,windowClosed)));
-	}
 
 	NAN_METHOD(MediaDetectWrapper::New)
 	{
@@ -125,10 +141,6 @@ namespace MediaDetect
 			MediaDetectWrapper *obj = new MediaDetectWrapper;
 			obj->Wrap(info.This());
 
-#ifdef _WIN32
-			obj->mediaDetector_.CreateMainThread();
-			obj->mediaDetector_.SetOwner(obj);
-#endif
 
 			info.GetReturnValue().Set(info.This());
 		}
@@ -140,77 +152,41 @@ namespace MediaDetect
 			info.GetReturnValue().Set(cons->NewInstance(argc,argv));
 		}
 	}
-
-	NAN_PROPERTY_GETTER(MediaDetectWrapper::MediaDetectWrapperGetter)
+	NAN_METHOD(MediaDetectWrapper::GetActiveTabLink)
 	{
-		MediaDetectWrapper* obj = Nan::ObjectWrap::Unwrap<MediaDetectWrapper>(info.This());
+		v8::Local<v8::Array> args = info[0].As<v8::Array>();
+		v8::Isolate* isolate = info.GetIsolate();
+
+		V8Value argHandle = args->Get(v8::String::NewFromUtf8(isolate,"Handle"));
+		V8Value argBrowser = args->Get(v8::String::NewFromUtf8(isolate,"Browser"));
+
+		int32_t pid = argHandle->Int32Value();
+		int32_t browser = argBrowser->Int32Value();
+
+		Win32MediaDetect win32;
+		std::string link = win32.GetActiveTabLink((intptr_t)pid,browser);
+
+		if(!link.empty())
+			info.GetReturnValue().Set(Nan::New(link.c_str()).ToLocalChecked());
+		else
+			info.GetReturnValue().Set(Nan::Null());
 	}
 
-	void MediaDetectWrapper::OnMediaDetected(DetectInfo* detected)
+	NAN_METHOD(MediaDetectWrapper::CheckIfTabIsOpen)
 	{
-		if(!detected)
-			return;
+		v8::Local<v8::Array> args = info[0].As<v8::Array>();
+		v8::Isolate* isolate = info.GetIsolate();
 
-		Nan::HandleScope scope;
+		V8Value argHandle = args->Get(v8::String::NewFromUtf8(isolate,"Handle"));
+		V8Value argBrowser = args->Get(v8::String::NewFromUtf8(isolate,"Browser"));
+		V8Value argTitle = args->Get(v8::String::NewFromUtf8(isolate,"Title"));
 
-		Local<Object> val = Nan::New<v8::Object>();
+		int32_t pid = argHandle->Int32Value();
+		int32_t browser = argBrowser->Int32Value();
+		std::string title = std::string(*v8::String::Utf8Value(argTitle));
 
-		Nan::Set(val,Nan::New("WindowName").ToLocalChecked(),Nan::New(detected->WindowName).ToLocalChecked());
-		Nan::Set(val,Nan::New("WindowId").ToLocalChecked(),Nan::New(std::to_string(detected->Id)).ToLocalChecked());
-
-		PersistentValue value;
-		value.Reset(val);
-
-		if(detected->Event == DE_CREATED)
-		{
-			auto c = g_CallbackMap.find("WindowCreated");
-
-			if(c != g_CallbackMap.end())
-			{
-				Local<Function> local = Nan::New(c->second.second);
-
-				Local<Value> ret[1] ={Nan::New(value)};
-				local->Call(Null(Isolate::GetCurrent()),1,ret);
-			}
-		}
-
-		if(detected->Event == DE_ACTIVATED)
-		{
-			auto c = g_CallbackMap.find("WindowActivated");
-
-			if(c != g_CallbackMap.end())
-			{
-				Local<Function> local = Nan::New(c->second.second);
-
-				Local<Value> ret[1] ={Nan::New(value)};
-				local->Call(Null(Isolate::GetCurrent()),1,ret);
-			}
-		}
-
-		if(detected->Event == DE_CLOSED)
-		{
-			auto c = g_CallbackMap.find("WindowClosed");
-
-			if(c != g_CallbackMap.end())
-			{
-				Local<Function> local = Nan::New(c->second.second);
-
-				Local<Value> ret[1] ={Nan::New(value)};
-				local->Call(Null(Isolate::GetCurrent()),1,ret);
-			}
-		}
-
-		if(detected->Event == DE_MONITORCHANGED)
-		{
-			auto c = g_CallbackMap.find("WindowMonitorChanged");
-
-			if(c != g_CallbackMap.end())
-			{
-				Local<Function> local = Nan::New(c->second.second);
-
-				Local<Value> ret[1] ={Nan::New(value)};
-				local->Call(Null(Isolate::GetCurrent()),1,ret);
-			}
-		}
+		Win32MediaDetect win32;
+		bool isOpen = win32.CheckIfTabWithTitleIsOpen(title,(intptr_t)pid,browser);
+		info.GetReturnValue().Set(isOpen);
 	}
 }

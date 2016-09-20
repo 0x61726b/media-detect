@@ -16,25 +16,24 @@
 #ifndef __Win32MediaDetect_h__
 #define __Win32MediaDetect_h__
 //----------------------------------------------------------------------------
+
 #define WIN32_LEAN_AND_MEAN
+#include <vector>
+#include <map>
 #include <Windows.h>
-#include <nan.h>
-
-#ifdef _WIN32
-#include <windows.h>
-typedef DWORD ThreadId;
-#else
-#include <unistd.h>
-#include <pthread.h>
-typedef unsigned int ThreadId;
-#endif
-
-
-//----------------------------------------------------------------------------
 
 namespace MediaDetect
 {
 	class MediaDetectWrapper;
+
+	struct WndInfo
+	{
+		unsigned long ProcessID;
+		intptr_t Handle;
+		std::string ClassName;
+		std::string ProcessName;
+		std::string Title;
+	};
 
 	class Win32MediaDetect
 	{
@@ -42,56 +41,14 @@ namespace MediaDetect
 		Win32MediaDetect();
 		virtual ~Win32MediaDetect();
 
-		static Win32MediaDetect* GetInstance();
+		std::vector<std::string> GetFilesOpenByProcess(unsigned PID);
+		std::vector<WndInfo> GetWindows();
 
-		void CreateMainThread();
-		void Init();
+		std::string GetActiveTabLink(intptr_t handle,unsigned browser);
+		bool CheckIfTabWithTitleIsOpen(const std::string& title,intptr_t handle,unsigned browser);
 
-		void ThreadRunner();
-
-		void SetOwner(MediaDetectWrapper* obj);
-
-		static LRESULT CALLBACK DetectorWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
-
-		void OnWindowDetected(const std::string& name);
-
-		static void TaskOnMainThread(uv_async_t* req);
-
-		uv_async_t async;
-		uv_loop_t *loop;
-
-		ThreadId main_thread;
-	public:
-		static HWND DetectorHandle;
-		static UINT shellHookMessage_;
-
-		static Win32MediaDetect* inst_;
-		MediaDetectWrapper* owner_;
-	private:
-
-		
-	};
-
-	struct TaskInfo
-	{
-		MediaDetect::Win32MediaDetect* Instance;
-	};
-
-	enum DetectEvent
-	{
-		DE_CREATED,
-		DE_ACTIVATED,
-		DE_CLOSED,
-		DE_MONITORCHANGED
-	};
-
-	struct DetectInfo
-	{
-		std::string WindowName;
-		INT_PTR Id;
-		DetectEvent Event;
-
-		TaskInfo Task;
+		std::vector<std::string> videoFormats;
+		std::vector<int> webBrowsers;
 	};
 }
 
