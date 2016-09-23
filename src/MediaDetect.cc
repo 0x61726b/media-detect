@@ -84,6 +84,8 @@ namespace MediaDetect
 
 		int32_t pid = argPid->Int32Value();
 
+#ifdef _WIN32
+
 		Win32MediaDetect win32;
 		std::vector<std::string> files = win32.GetFilesOpenByProcess(pid);
 
@@ -94,6 +96,7 @@ namespace MediaDetect
 		}
 		else
 			info.GetReturnValue().Set(Nan::Null());
+#endif
 	}
 
 	NAN_METHOD(MediaDetectWrapper::GetRunningPlayers)
@@ -103,9 +106,8 @@ namespace MediaDetect
 
 			PersistentObject caller;
 			caller.Reset(info.This());*/
-
-
 		typedef std::vector<WndInfo> WindowVector;
+#ifdef _WIN32
 		Win32MediaDetect win32;
 		WindowVector players = win32.GetWindows();
 		WindowVector::iterator playersIt = players.begin();
@@ -130,6 +132,14 @@ namespace MediaDetect
 		Nan::Set(returnVal,Nan::New("PlayerArray").ToLocalChecked(),playerArray);
 
 		info.GetReturnValue().Set(returnVal);
+#endif
+
+#ifdef __linux__
+		NixMediaDetect nix;
+		WindowVector windows = nix.GetWindows();
+
+		info.GetReturnValue().Set(Nan::Null());
+#endif
 	}
 
 
@@ -163,6 +173,7 @@ namespace MediaDetect
 		int32_t pid = argHandle->Int32Value();
 		int32_t browser = argBrowser->Int32Value();
 
+#ifdef _WIN32
 		Win32MediaDetect win32;
 		std::string link = win32.GetActiveTabLink((intptr_t)pid,browser);
 
@@ -170,6 +181,7 @@ namespace MediaDetect
 			info.GetReturnValue().Set(Nan::New(link.c_str()).ToLocalChecked());
 		else
 			info.GetReturnValue().Set(Nan::Null());
+#endif
 	}
 
 	NAN_METHOD(MediaDetectWrapper::CheckIfTabIsOpen)
@@ -185,8 +197,10 @@ namespace MediaDetect
 		int32_t browser = argBrowser->Int32Value();
 		std::string title = std::string(*v8::String::Utf8Value(argTitle));
 
+#ifdef _WIN32
 		Win32MediaDetect win32;
 		bool isOpen = win32.CheckIfTabWithTitleIsOpen(title,(intptr_t)pid,browser);
 		info.GetReturnValue().Set(isOpen);
+#endif
 	}
 }

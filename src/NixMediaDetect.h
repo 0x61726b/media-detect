@@ -13,44 +13,31 @@
 //with this program; if not, write to the Free Software Foundation, Inc.,
 //51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.*/
 //----------------------------------------------------------------------------
-#ifndef __MediaDetect_h__
-#define __MediaDetect_h__
+#ifndef __NixMediaDetect_h__
+#define __NixMediaDetect_h__
 //----------------------------------------------------------------------------
-#include <nan.h>
-#if defined(__WINSCW__)
-#include "Win32MediaDetect.h"
-#elif defined(_MSC_VER)
-#include "Win32MediaDetect.h"
-#elif defined(__linux__)
-#include "NixMediaDetect.h"
-#endif
-#include "Common.h"
 
+#include <vector>
 #include <map>
-//----------------------------------------------------------------------------
+
 namespace MediaDetect
 {
-	class MediaDetectWrapper : public Nan::ObjectWrap
+	class MediaDetectWrapper;
+
+	struct WndInfo
 	{
-	public:
-		static void Init(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE target);
-
-	public:
-		explicit MediaDetectWrapper();
-		~MediaDetectWrapper();
-
-		static NAN_METHOD(New);
-
-
-		static NAN_METHOD(GetRunningPlayers);
-		static NAN_METHOD(GetActiveTabLink);
-		static NAN_METHOD(CheckIfTabIsOpen);
-		static NAN_METHOD(GetVideoFileOpenByPlayer);
-		static NAN_METHOD(Release);
-
-		static Nan::Persistent<v8::Function> constructor;
+		std::string Title;
 	};
 
+	class NixMediaDetect
+	{
+	public:
+		NixMediaDetect();
+		virtual ~NixMediaDetect();
+
+		std::vector<WndInfo> GetWindows();
+		std::vector<WndInfo> GetCurrentWindows();
+	};
 }
-//----------------------------------------------------------------------------
+
 #endif
