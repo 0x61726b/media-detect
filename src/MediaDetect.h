@@ -20,11 +20,11 @@
 
 #include "Common.h"
 
-#ifdef CHIIKA_WIN32
+#if defined(CHIIKA_WIN32)
 #include "Win32MediaDetect.h"
-#elif CHIIKA_LINUX
+#elif defined(CHIIKA_LINUX)
 #include "NixMediaDetect.h"
-#elif CHIIKA_MACOSX
+#elif defined(CHIIKA_MACOSX)
 #include "OsxMediaDetect.h"
 #endif
 

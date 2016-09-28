@@ -11,7 +11,7 @@ Check out the platform sections to see what this library does in each platform.
 
 Supports detecting media players,web browsers.
 
-# Usage (Win32)
+# Usage - Win32
 
 ## MediaDetect.GetCurrentWindows().PlayerArray
 
@@ -33,6 +33,7 @@ console.log(currentWindows);
 }
 ```
 
+![](http://i.imgur.com/EDbBdby.png)
 
 ## MediaDetect.GetVideoFileOpenByPlayer({ pid })
 
@@ -44,17 +45,18 @@ var md = require('.').MediaDetect();
 // Find a video player's PID
 
 var videoFile = md.GetVideoFileOpenByPlayer({ pid: pid });
-
 ```
+
+![](http://i.imgur.com/WUVV5jp.png)
 
 ## MediaDetect.CheckIfTabIsOpen({ Handle, Browser,Title })
 
 Returns if a tab with a given title is still open.
 
 ### Parameters
-- Handle : Hwnd of the window
-- Browser Index - (0: chrome, 1: Firefox, 2: IE )
-- Title: Tab Title
+- **Handle** : Hwnd of the window
+- **Browser Index** - (0: chrome, 1: Firefox, 2: IE )
+- **Title**: Tab Title
 
 
 ## MediaDetect.GetActiveTabLink({ Handle, Browser })
@@ -62,14 +64,13 @@ Returns if a tab with a given title is still open.
 Returns URL of an active tab of a given browser.
 
 ### Parameters
-- Handle : Hwnd of the window
-- Browser Index - (0: chrome, 1: Firefox, 2: IE )
+- **Handle** : Hwnd of the window
+- **Browser Index** - (0: chrome, 1: Firefox, 2: IE )
+
+[Here](https://github.com/arkenthera/Chiika/blob/master/src/main_process/media-detect-win32-process.coffee#L84) is how this library is being used in Chiika.
 
 
-[Example Usage](https://github.com/arkenthera/Chiika/blob/master/src/main_process/media-detect-win32-process.coffee#L84)
-
-
-# Usage (OSX)
+# Usage - Osx
 
 ## MediaDetect.GetAllTabsMacOsx()
 
@@ -78,9 +79,14 @@ Returns all tabs currently open across Safari and Chrome.
 Example output
 
 ```
-{
-  tabTitle,
-  tabUrl,
-  browser
-}
+[ { tabTitle: 'Google',
+    tabUrl: 'https://www.google.com.tr/?client=safari&channel=mac_bm&gws_rd=cr&ei=OOrrV5m9N8T9UobIhcgK',
+    browser: 'Safari' },
+  { tabTitle: 'Chrome',
+    tabUrl: 'chrome://chrome-signin/?access_point=0&reason=0',
+    browser: 'Chrome' } ]
 ```
+
+# Usage - Linux
+
+Coming soon™
