@@ -11,6 +11,14 @@ Check out the platform sections to see what this library does in each platform.
 
 Supports detecting media players,web browsers.
 
+## Osx
+
+Supports detecting web browsers.
+
+## Linux
+
+Soon ™
+
 # Usage - Win32
 
 ## MediaDetect.GetCurrentWindows().PlayerArray
