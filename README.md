@@ -1,60 +1,86 @@
 #Media Detect
 
-```npm install media-detect```
+This repository is being developed for [Chiika](https://github.com/arkenthera/Chiika).
+
+## Synopsis
+Purpose of this library is to detect what the user is currently watching. Be it via media players or using a browser such as Chrome,Firefox etc.
+This is achieved by either native APIs or browser extensions like [chiika-chrome](https://github.com/arkenthera/chiika-chrome) or [chiika-firefox](https://github.com/arkenthera/chiika-firefox).
+Check out the platform sections to see what this library does in each platform.
+
+## Windows
+
+Supports detecting media players,web browsers.
+
+# Usage (Win32)
+
+## MediaDetect.GetCurrentWindows().PlayerArray
+
+Lists every possible window
+```
+
+//Get all windows
+var md = require('.').MediaDetect();
+var currentWindows = md.GetCurrentWindows().PlayerArray;
+console.log(currentWindows);
+
+// Output will be every window in the format of
+{
+  windowTitle,
+  windowClass,
+  processName,
+  PID,
+  Handle
+}
+```
 
 
-Media-Detect is a tool that listens global window creation/destruction and fires callbacks accordingly.
-Only works on Windows for *now*. On Windows the library hooks into shell using **RegisterShellHookWindow** then listens shell messages and fires javascript callbacks.
+## MediaDetect.GetVideoFileOpenByPlayer({ pid })
 
-![](http://i.imgur.com/L9U8OOK.png)
+Returns a video file open by a process.
 
-#Usage
+```
+var md = require('.').MediaDetect();
 
-Require the module and simply create an object then register the callback you'd like to listen.
+// Find a video player's PID
+
+var videoFile = md.GetVideoFileOpenByPlayer({ pid: pid });
 
 ```
 
-var NativeMD = require('media-detect').MediaDetect;
+## MediaDetect.CheckIfTabIsOpen({ Handle, Browser,Title })
 
-var MediaDetect = new NativeMD();
+Returns if a tab with a given title is still open.
 
-//Called when a new window created,i.e., you launch a program/explorer
-MediaDetect.SetWindowCreateCallback( function(arg) { //Arg will be [WindowName,WindowId]
-  //...
-});
+### Parameters
+- Handle : Hwnd of the window
+- Browser Index - (0: chrome, 1: Firefox, 2: IE )
+- Title: Tab Title
 
-//Called when a window is activated
-MediaDetect.SetWindowActivateCallback( function(arg) { //Arg will be [WindowName,WindowId]
-  //...
-});
 
-//Called when a window closed/destroyed
-MediaDetect.SetWindowCloseCallback( function(arg) { //Arg will be [WindowName,WindowId]
-  //...
-});
+## MediaDetect.GetActiveTabLink({ Handle, Browser })
 
-//Called when a window changes monitor
-MediaDetect.SetWindowMonitorChangeCallback( function(arg) { //Arg will be [WindowName,WindowId]
-  //...
-});
+Returns URL of an active tab of a given browser.
+
+### Parameters
+- Handle : Hwnd of the window
+- Browser Index - (0: chrome, 1: Firefox, 2: IE )
+
+
+[Example Usage](https://github.com/arkenthera/Chiika/blob/master/src/main_process/media-detect-win32-process.coffee#L84)
+
+
+# Usage (OSX)
+
+## MediaDetect.GetAllTabsMacOsx()
+
+Returns all tabs currently open across Safari and Chrome.
+
+Example output
 
 ```
-
-#Tests
-
-Install ```npm i jasmine-node``` then run ```npm test```. Then launch some windows/apps and see the output.
-
-![](http://i.imgur.com/q28a5GV.png)
-
-
-#Installing
-
-``` npm install media-detect ```
-
-You'll need
-
-- MSVC for Windows (Visual Studio 2013)
-- node-gyp
-- NaN
-
-or just type ```npm install``` and NPM will build it for you.
+{
+  tabTitle,
+  tabUrl,
+  browser
+}
+```

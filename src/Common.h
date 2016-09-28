@@ -28,4 +28,13 @@
 #define PersistentObject Nan::Persistent<v8::Object, v8::CopyablePersistentTraits<v8::Object>>
 #define PersistentFunction Nan::Persistent<v8::Function, v8::CopyablePersistentTraits<v8::Function>>
 //----------------------------------------------------------------------------
+
+#if defined(__WINSCW__) || defined(_MSC_VER)
+#define CHIIKA_WIN32
+#elif defined(__linux__)
+#define CHIIKA_LINUX
+#elif defined(__APPLE__)
+#define CHIIKA_MACOSX
+#endif
+
 #endif

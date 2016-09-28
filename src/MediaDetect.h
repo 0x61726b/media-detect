@@ -16,20 +16,18 @@
 #ifndef __MediaDetect_h__
 #define __MediaDetect_h__
 //----------------------------------------------------------------------------
-#ifdef __APPLE__
-#define CHIIKA_MACOSX
-#endif
 #include <nan.h>
-#if defined(__WINSCW__)
-#include "Win32MediaDetect.h"
-#elif defined(_MSC_VER)
-#include "Win32MediaDetect.h"
-#elif defined(__linux__)
-#include "NixMediaDetect.h"
-#endif
-#include "OsxMediaDetect.h"
 
 #include "Common.h"
+
+#ifdef CHIIKA_WIN32
+#include "Win32MediaDetect.h"
+#elif CHIIKA_LINUX
+#include "NixMediaDetect.h"
+#elif CHIIKA_MACOSX
+#include "OsxMediaDetect.h"
+#endif
+
 
 #include <map>
 //----------------------------------------------------------------------------
