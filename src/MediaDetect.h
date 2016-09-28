@@ -16,6 +16,9 @@
 #ifndef __MediaDetect_h__
 #define __MediaDetect_h__
 //----------------------------------------------------------------------------
+#ifdef __APPLE__
+#define CHIIKA_MACOSX
+#endif
 #include <nan.h>
 #if defined(__WINSCW__)
 #include "Win32MediaDetect.h"
@@ -24,6 +27,8 @@
 #elif defined(__linux__)
 #include "NixMediaDetect.h"
 #endif
+#include "OsxMediaDetect.h"
+
 #include "Common.h"
 
 #include <map>
@@ -47,6 +52,10 @@ namespace MediaDetect
 		static NAN_METHOD(CheckIfTabIsOpen);
 		static NAN_METHOD(GetVideoFileOpenByPlayer);
 		static NAN_METHOD(Release);
+
+		#ifdef CHIIKA_MACOSX
+		static NAN_METHOD(GetAllTabsMacOsx);
+		#endif
 
 		static Nan::Persistent<v8::Function> constructor;
 	};

@@ -61,6 +61,43 @@
                     ]
                 }
             ]
+        }],
+        ['OS=="mac"',{
+            "targets": [
+                {
+                    "target_name": "MediaDetect",
+                    "sources": [
+                            "src/Common.h",
+                            "src/MediaDetect.h",
+                            "src/osx/MediaDetect.mm",
+                            "src/OsxMediaDetect.h",
+                            "src/OsxMediaDetect.mm",
+                            "src/osx/Safari.h",
+                            "src/osx/Chrome.h",
+                            "src/osx/Init.mm",
+                    ],
+                    "link_settings": {
+                        "libraries": [
+                            'Foundation.framework',
+                            'AppKit.framework',
+                            'ScriptingBridge.framework'
+                        ]
+                    },
+                    "cflags": [
+                        "-Wall"
+                    ],
+                    "defines!":[
+                        '_HAS_EXPECTIONS=0',
+                        "CHIIKA_MACOSX=1"
+                    ],
+                    "variables":{
+                        "CURRENT_DIR":"<!(echo %~dp0)"
+                    },
+                    "include_dirs": [
+                        "<!(node -e \"require('nan')\")"
+                    ]
+                }
+            ]
         }]
     ]
 }
